@@ -73,24 +73,47 @@ body{font-family:'Noto Sans JP',sans-serif;color:var(--black);background:var(--w
 .jt-solution .jt-section-label{color:rgba(255,255,255,0.4);}
 .jt-solution .jt-section-h2{color:var(--white);}
 .jt-solution-desc{font-size:15px;font-weight:300;line-height:2;color:rgba(255,255,255,0.75);max-width:520px;margin:0 auto 60px;}
-.jt-steps{display:flex;flex-direction:column;gap:0;max-width:560px;margin:0 auto;}
+
+/* STEP CARDS */
+.jt-steps{display:flex;flex-direction:column;gap:20px;max-width:560px;margin:0 auto;}
 .jt-step{
-  display:flex;gap:24px;align-items:flex-start;
-  padding:32px 0;
-  border-bottom:1px solid rgba(255,255,255,0.1);
+  background:var(--white);
+  border:1px solid rgba(255,255,255,0.15);
+  padding:28px 24px 24px;
   text-align:left;
+  position:relative;
+  overflow:hidden;
 }
-.jt-step:last-child{border-bottom:none;}
+.jt-step::before{
+  content:'';position:absolute;top:0;left:0;
+  width:3px;height:100%;background:var(--white);opacity:1;
+}
 .jt-step-num{
   font-family:'Bebas Neue',sans-serif;
-  font-size:48px;line-height:1;
-  color:rgba(255,255,255,0.15);
-  flex-shrink:0;width:60px;
+  font-size:52px;line-height:1;
+  color:rgba(0,0,0,0.1);
+  margin-bottom:2px;
 }
-.jt-step-body{}
-.jt-step-month{font-size:11px;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.4);margin-bottom:8px;}
-.jt-step-title{font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px;}
-.jt-step-desc{font-size:13px;font-weight:300;line-height:1.8;color:rgba(255,255,255,0.6);}
+.jt-step-month{font-size:11px;font-weight:700;letter-spacing:0.2em;color:rgba(0,0,0,0.4);margin-bottom:12px;}
+.jt-step-icons{display:flex;gap:8px;margin-bottom:12px;}
+.jt-step-icon{
+  width:34px;height:34px;
+  border:1px solid rgba(0,0,0,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+  color:var(--black);
+  background:var(--white);
+}
+.jt-step-title{font-size:18px;font-weight:700;color:var(--black);margin-bottom:10px;line-height:1.4;}
+.jt-step-desc{font-size:13px;font-weight:300;line-height:1.9;color:rgba(0,0,0,0.6);margin-bottom:14px;}
+.jt-step-flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.jt-flow-tag{
+  font-size:11px;font-weight:700;
+  border:1px solid rgba(0,0,0,0.25);
+  color:var(--black);
+  padding:4px 10px;letter-spacing:0.05em;
+}
+.jt-flow-arrow{font-size:11px;color:rgba(0,0,0,0.3);}
 
 /* GOAL */
 .jt-goal{padding:80px 24px;background:var(--white);text-align:center;}
@@ -112,7 +135,19 @@ body{font-family:'Noto Sans JP',sans-serif;color:var(--black);background:var(--w
   padding:48px 36px;
   border:2px solid var(--black);
 }
-.jt-price-name{font-size:13px;font-weight:700;letter-spacing:0.15em;margin-bottom:24px;}
+.jt-price-name{font-size:13px;font-weight:700;letter-spacing:0.15em;margin-bottom:16px;}
+.jt-price-monitor-label{
+  display:inline-block;
+  font-size:11px;font-weight:700;letter-spacing:0.15em;
+  background:var(--black);color:var(--white);
+  padding:4px 12px;margin-bottom:12px;
+}
+.jt-price-original{
+  font-size:15px;font-weight:400;
+  color:var(--midgray);
+  text-decoration:line-through;
+  margin-bottom:4px;
+}
 .jt-price-main{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,10vw,72px);line-height:1;}
 .jt-price-unit{font-size:13px;font-weight:300;color:var(--midgray);margin:8px 0 24px;}
 .jt-price-divider{width:40px;height:2px;background:var(--black);margin:0 auto 24px;}
@@ -326,30 +361,69 @@ body{font-family:'Noto Sans JP',sans-serif;color:var(--black);background:var(--w
   <h2 class="jt-section-h2 fade-in">3ヶ月で「自走」できるようになる<br>ステップ設計</h2>
   <p class="jt-solution-desc fade-in">毎日やらなくていい。完璧にやらなくていい。<br>少しずつ「自分でできる」を積み重ねていく3ヶ月です。</p>
   <div class="jt-steps">
+
+    <!-- 1ヶ月目 -->
     <div class="jt-step fade-in">
       <div class="jt-step-num">01</div>
-      <div class="jt-step-body">
-        <div class="jt-step-month">1ヶ月目</div>
-        <div class="jt-step-title">正しい動きを身につける</div>
-        <div class="jt-step-desc">週1回×45分のオンラインパーソナル。フォーム・メニュー・継続の仕組みをゼロから作ります。</div>
+      <div class="jt-step-month">1ヶ月目</div>
+      <div class="jt-step-icons">
+        <div class="jt-step-icon" title="トレーナーと一緒に"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="jt-step-icon" title="フォーム確認"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <div class="jt-step-icon" title="メニュー作成"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+      </div>
+      <div class="jt-step-title">一緒にやって、身につける</div>
+      <div class="jt-step-desc">週1回×45分のオンラインパーソナル。<br>正しいフォーム・自分に合ったメニュー・続く仕組みをゼロから一緒に作ります。<br>「何をすればいいかわからない」をまず解消します。</div>
+      <div class="jt-step-flow">
+        <span class="jt-flow-tag">週1パーソナル45分</span>
+        <span class="jt-flow-arrow">→</span>
+        <span class="jt-flow-tag">フォーム定着</span>
+        <span class="jt-flow-arrow">→</span>
+        <span class="jt-flow-tag">メニュー完成</span>
       </div>
     </div>
+
+    <!-- 2ヶ月目 -->
     <div class="jt-step fade-in">
       <div class="jt-step-num">02</div>
-      <div class="jt-step-body">
-        <div class="jt-step-month">2ヶ月目</div>
-        <div class="jt-step-title">自分でやる習慣をつくる</div>
-        <div class="jt-step-desc">隔週45分パーソナル＋パーソナルがない週に5〜10分チェックイン。少しずつひとりで動く時間を増やします。</div>
+      <div class="jt-step-month">2ヶ月目</div>
+      <div class="jt-step-icons">
+        <div class="jt-step-icon" title="繋ぐ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div class="jt-step-icon" title="確認"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="jt-step-icon" title="報告"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      </div>
+      <div class="jt-step-title">ひとこともらって、自分でやる</div>
+      <div class="jt-step-desc">隔週45分はパーソナルトレーニング。<br>残りの週は、繋いで今日やることを確認したら、あとは自分でやるだけ。終わったら報告。<br>「ひとりでもできた」を少しずつ積み重ねます。</div>
+      <div class="jt-step-flow">
+        <span class="jt-flow-tag">繋ぐ</span>
+        <span class="jt-flow-arrow">→</span>
+        <span class="jt-flow-tag">確認</span>
+        <span class="jt-flow-arrow">→</span>
+        <span class="jt-flow-tag">自分でやる</span>
+        <span class="jt-flow-arrow">→</span>
+        <span class="jt-flow-tag">報告</span>
       </div>
     </div>
+
+    <!-- 3ヶ月目 -->
     <div class="jt-step fade-in">
       <div class="jt-step-num">03</div>
-      <div class="jt-step-body">
-        <div class="jt-step-month">3ヶ月目</div>
-        <div class="jt-step-title">「やらないと気持ち悪い」状態へ</div>
-        <div class="jt-step-desc">週1回10分チェックイン＋最終回45分卒業パーソナル。自分でできるか、確認して卒業です。</div>
+      <div class="jt-step-month">3ヶ月目</div>
+      <div class="jt-step-icons">
+        <div class="jt-step-icon" title="ひとりで実施"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l3 3"/><path d="M9 13l-2 4"/><path d="M15 13l2 4"/></svg></div>
+        <div class="jt-step-icon" title="週次チェック"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <div class="jt-step-icon" title="卒業"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+      </div>
+      <div class="jt-step-title">もう、ひとりでできる</div>
+      <div class="jt-step-desc">週1回10分の報告チェックインのみ。<br>最終回は45分の卒業パーソナルで「自分でできる」を確認して卒業。<br>もうトレーナーがいなくても大丈夫な状態です。</div>
+      <div class="jt-step-flow">
+        <span class="jt-flow-tag">週1チェックイン10分</span>
+        <span class="jt-flow-arrow">→</span>
+        <span class="jt-flow-tag">自走</span>
+        <span class="jt-flow-arrow">→</span>
+        <span class="jt-flow-tag">卒業パーソナル45分</span>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -370,11 +444,14 @@ body{font-family:'Noto Sans JP',sans-serif;color:var(--black);background:var(--w
   <h2 class="jt-section-h2 fade-in">料金</h2>
   <div class="jt-price-box fade-in">
     <div class="jt-price-name">3ヶ月プログラム　一括払い</div>
-    <div class="jt-price-main">¥69,800</div>
+    <div class="jt-price-monitor-label">初回モニター価格</div>
+    <div class="jt-price-original">通常価格 ¥69,800</div>
+    <div class="jt-price-main">¥29,800</div>
     <div class="jt-price-unit">（税込）</div>
     <div class="jt-price-divider"></div>
-    <div class="jt-price-split">分割払いも可　¥24,800 × 3回（税込）</div>
+    <div class="jt-price-split">分割払いも可（詳細は体験時にご相談ください）</div>
     <div class="jt-price-note">
+      ※ モニター価格での募集は先着3名限定です。<br>
       ※ まずは無料体験（50分・完全無料）からどうぞ。
     </div>
   </div>
