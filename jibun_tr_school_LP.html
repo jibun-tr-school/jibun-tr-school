@@ -154,6 +154,69 @@ body{font-family:'Noto Sans JP',sans-serif;color:var(--black);background:var(--w
 .jt-price-split{font-size:13px;font-weight:500;color:var(--midgray);}
 .jt-price-note{font-size:12px;font-weight:300;color:var(--midgray);margin-top:16px;line-height:1.8;}
 
+/* MONITOR */
+.jt-monitor{padding:80px 24px;background:var(--black);color:var(--white);text-align:center;}
+.jt-monitor .jt-section-label{color:rgba(255,255,255,0.4);}
+.jt-monitor .jt-section-h2{color:var(--white);margin-bottom:16px;}
+.jt-monitor-lead{font-size:14px;font-weight:300;line-height:2;color:rgba(255,255,255,0.6);max-width:440px;margin:0 auto 48px;}
+.jt-monitor-card{
+  max-width:480px;margin:0 auto 48px;
+  background:var(--white);color:var(--black);
+  padding:40px 32px;
+  text-align:left;
+}
+.jt-monitor-card-badge{
+  display:inline-block;
+  font-size:11px;font-weight:700;letter-spacing:0.15em;
+  background:var(--black);color:var(--white);
+  padding:4px 12px;margin-bottom:20px;
+}
+.jt-monitor-price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}
+.jt-monitor-price-original{font-size:14px;color:var(--midgray);text-decoration:line-through;}
+.jt-monitor-price-new{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,12vw,72px);line-height:1;color:var(--black);}
+.jt-monitor-price-unit{font-size:13px;font-weight:300;color:var(--midgray);margin-bottom:24px;}
+.jt-monitor-divider{width:40px;height:2px;background:var(--black);margin:0 0 24px;}
+.jt-monitor-cond-title{font-size:11px;font-weight:700;letter-spacing:0.15em;color:var(--midgray);margin-bottom:12px;}
+.jt-monitor-cond-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.jt-monitor-cond-list li{
+  font-size:13px;font-weight:400;line-height:1.7;color:#333;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.jt-monitor-cond-list li::before{content:'✓';font-weight:700;color:var(--black);flex-shrink:0;margin-top:1px;}
+.jt-monitor-card-note{font-size:11px;font-weight:300;color:var(--midgray);margin-top:20px;line-height:1.8;}
+.jt-monitor-slots{margin-bottom:40px;}
+.jt-monitor-slots-label{font-size:12px;font-weight:300;color:rgba(255,255,255,0.4);letter-spacing:0.1em;margin-bottom:12px;}
+.jt-monitor-slots-row{display:flex;justify-content:center;gap:10px;}
+.jt-monitor-slot{
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;letter-spacing:0.05em;
+  color:var(--white);
+}
+.jt-monitor-slot.open{border-color:var(--white);}
+.jt-monitor-btn{
+  display:block;
+  background:var(--white);color:var(--black);
+  font-size:15px;font-weight:700;
+  padding:20px 48px;
+  max-width:400px;margin:0 auto 12px;
+  letter-spacing:0.05em;
+  text-decoration:none;
+  transition:opacity 0.2s,transform 0.2s;
+}
+.jt-monitor-btn:hover{opacity:0.85;transform:translateY(-2px);}
+.jt-monitor-btn-note{font-size:12px;color:rgba(255,255,255,0.4);}
+.jt-monitor-honest{
+  margin-top:56px;
+  padding-top:40px;
+  border-top:1px solid rgba(255,255,255,0.1);
+  max-width:480px;margin-left:auto;margin-right:auto;
+  text-align:left;
+}
+.jt-monitor-honest-label{font-size:11px;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.3);margin-bottom:16px;text-align:center;}
+.jt-monitor-honest-text{font-size:13px;font-weight:300;line-height:2;color:rgba(255,255,255,0.6);}
+
 /* PROFILE */
 .jt-profile{padding:80px 24px;background:var(--white);}
 .jt-profile-inner{max-width:560px;margin:0 auto;text-align:center;}
@@ -438,22 +501,61 @@ body{font-family:'Noto Sans JP',sans-serif;color:var(--black);background:var(--w
   </div>
 </section>
 
-<!-- PRICE -->
-<section class="jt-price">
-  <div class="jt-section-label fade-in">PRICE</div>
-  <h2 class="jt-section-h2 fade-in">料金</h2>
-  <div class="jt-price-box fade-in">
-    <div class="jt-price-name">3ヶ月プログラム　一括払い</div>
-    <div class="jt-price-monitor-label">初回モニター価格</div>
-    <div class="jt-price-original">通常価格 ¥69,800</div>
-    <div class="jt-price-main">¥29,800</div>
-    <div class="jt-price-unit">（税込）</div>
-    <div class="jt-price-divider"></div>
-    <div class="jt-price-split">分割払いも可（詳細は体験時にご相談ください）</div>
-    <div class="jt-price-note">
-      ※ モニター価格での募集は先着3名限定です。<br>
+<!-- MONITOR -->
+<section class="jt-monitor">
+  <div class="jt-section-label fade-in">Monitor Recruiting</div>
+  <h2 class="jt-section-h2 fade-in">初回モニター募集<br><span style="font-size:0.75em;font-weight:700;opacity:0.7;">— 正直にお伝えします —</span></h2>
+  <p class="jt-monitor-lead fade-in">
+    このプログラムはまだ始まったばかりで、<br>
+    卒業者の実績がありません。<br>
+    だから正直に言います——<br>
+    最初の3名に、特別価格で<br>
+    体験していただけませんか。
+  </p>
+
+  <div class="jt-monitor-card fade-in">
+    <div class="jt-monitor-card-badge">初回モニター限定・先着3名</div>
+    <div class="jt-monitor-price-row">
+      <span class="jt-monitor-price-original">通常価格 ¥69,800</span>
+    </div>
+    <div class="jt-monitor-price-new">¥5,000</div>
+    <div class="jt-monitor-price-unit">（税込・3ヶ月プログラム一括）</div>
+    <div class="jt-monitor-divider"></div>
+    <div class="jt-monitor-cond-title">お願いしたいこと</div>
+    <ul class="jt-monitor-cond-list">
+      <li>3ヶ月間、プログラムに真剣に取り組んでいただくこと</li>
+      <li>率直なフィードバックをいただくこと</li>
+      <li>体験談・感想の掲載にご協力いただくこと</li>
+    </ul>
+    <div class="jt-monitor-card-note">
+      ※ 分割払いも可（詳細は体験時にご相談ください）<br>
       ※ まずは無料体験（50分・完全無料）からどうぞ。
     </div>
+  </div>
+
+  <div class="jt-monitor-slots fade-in">
+    <p class="jt-monitor-slots-label">残り枠</p>
+    <div class="jt-monitor-slots-row">
+      <div class="jt-monitor-slot open">空</div>
+      <div class="jt-monitor-slot open">空</div>
+      <div class="jt-monitor-slot open">空</div>
+    </div>
+  </div>
+
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSe5X1InlGATvTUaMDmtlY6u9gmb8m97UANqXm2U_8NIPEIZPA/viewform?usp=header" class="jt-monitor-btn fade-in" target="_blank">
+    ▶ モニターとして無料体験に申し込む（50分）
+  </a>
+  <p class="jt-monitor-btn-note fade-in">Googleフォームが開きます。所要時間1分。</p>
+
+  <div class="jt-monitor-honest fade-in">
+    <p class="jt-monitor-honest-label">— なぜ特別価格なのか、正直に —</p>
+    <p class="jt-monitor-honest-text">
+      このプログラムに自信はあります。<br>
+      ただ、「続けられる人を増やす」という新しい形のサービスとして、<br>
+      まず実際に体験してもらい、リアルな声を積み重ねることが先だと思いました。<br><br>
+      特別価格だからといって、手を抜くつもりはありません。<br>
+      最初の3名に、全力で向き合います。
+    </p>
   </div>
 </section>
 
