@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TRAINING LOG</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#000;color:#fff;font-family:'DotGothic16',monospace;padding-bottom:90px}
+.hd{background:#000;border-bottom:3px solid #fff;padding:12px 14px;position:sticky;top:0;z-index:50}
+.hd-top{font-size:17px;letter-spacing:2px;margin-bottom:10px}
+.hd-date{font-size:13px;color:#aaa;margin-left:6px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:7px 14px;border:2px solid #444;background:#000;color:#888;font-size:13px;cursor:pointer;font-family:'DotGothic16',monospace}
+.tab.on{border-color:#fff;color:#fff;background:#1a1a1a}
+.page{display:none;padding:12px}
+.page.on{display:block}
+.dqwin{border:3px solid #fff;position:relative;margin-bottom:10px}
+.dqwin::after{content:'';position:absolute;inset:4px;border:1px solid #fff;pointer-events:none;z-index:0}
+.day-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.day-lbl{width:38px;height:38px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.day-info{flex:1}
+.day-title{font-size:15px;margin-bottom:3px}
+.day-sub{font-size:12px;color:#bbb}
+.day-pct{font-size:13px;color:#fff;flex-shrink:0}
+.pbar{height:4px;background:#222}
+.pbar-fill{height:100%;background:#fff;transition:width .3s}
+.day-body{display:none;padding:10px 12px 12px;border-top:2px solid #444}
+.day-body.open{display:block}
+.ex{border:1px solid #444;margin-bottom:8px}
+.ex-hd{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;cursor:pointer}
+.ex-name{font-size:14px}
+.ex-plan{font-size:11px;color:#999;margin-top:3px}
+.ex-chv{font-size:14px;color:#888;flex-shrink:0;margin-left:8px;transition:transform .2s}
+.ex-chv.open{transform:rotate(90deg)}
+.ex-body{display:none;padding:8px 11px 11px;border-top:1px solid #333}
+.ex-body.open{display:block}
+.plan-tag{font-size:11px;color:#999;border:1px solid #444;display:inline-block;padding:2px 7px;margin-bottom:8px}
+.tbl-hd{display:grid;grid-template-columns:26px 1fr 1fr 34px;gap:6px;padding:3px 0 6px;border-bottom:1px solid #333;margin-bottom:4px}
+.tbl-hd span{font-size:12px;color:#888;text-align:center}
+.tbl-hd span:first-child{text-align:left}
+.set-row{display:grid;grid-template-columns:26px 1fr 1fr 34px;gap:6px;align-items:center;padding:4px 0}
+.sn{font-size:12px;color:#888}
+.inp{background:#000;border:2px solid #444;padding:8px 3px;font-size:15px;font-weight:700;color:#fff;text-align:center;width:100%;font-family:'DotGothic16',monospace;-webkit-appearance:none}
+.inp:focus{outline:none;border-color:#fff}
+.chk{width:30px;height:30px;border:2px solid #444;background:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;margin:auto;color:#fff;font-family:'DotGothic16',monospace}
+.chk.on{background:#fff;border-color:#fff;color:#000}
+.add-row-btn{width:100%;margin-top:6px;padding:7px;background:#000;border:1px dashed #444;color:#666;font-size:12px;cursor:pointer;font-family:'DotGothic16',monospace}
+.memo-lbl{font-size:12px;color:#999;margin:10px 0 4px;padding-top:8px;border-top:1px solid #333}
+.memo-ta{width:100%;background:#000;border:2px solid #444;padding:8px;font-size:13px;color:#fff;font-family:'DotGothic16',monospace;resize:none;min-height:50px}
+.memo-ta:focus{outline:none;border-color:#fff}
+.bot{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:3px solid #fff;padding:10px 12px 22px;display:flex;gap:8px;z-index:50}
+.btn{flex:1;padding:13px;font-size:13px;cursor:pointer;border:none;font-family:'DotGothic16',monospace;letter-spacing:1px}
+.btn.pri{background:#fff;color:#000}
+.btn.sec{background:#000;color:#888;border:2px solid #444}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-8px);background:#000;color:#fff;padding:9px 18px;border:2px solid #fff;font-size:13px;opacity:0;transition:all .2s;z-index:999;white-space:nowrap;pointer-events:none;font-family:'DotGothic16',monospace}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.sec-ttl{font-size:15px;letter-spacing:2px;border-bottom:2px solid #fff;padding-bottom:6px;margin-bottom:12px}
+.rank-box{padding:14px;margin-bottom:12px}
+.rank-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.rank-icon{width:58px;height:58px;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.rank-lv{font-size:12px;color:#aaa;margin-bottom:3px}
+.rank-name{font-size:19px;letter-spacing:1px;margin-bottom:4px}
+.rank-total{font-size:13px;color:#bbb}
+.xp-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.xp-bar-out{height:10px;background:#1a1a1a;border:1px solid #444;overflow:hidden;margin-bottom:4px}
+.xp-bar-in{height:100%;background:#fff;transition:width .5s}
+.xp-next{font-size:12px;color:#888;text-align:right;margin-bottom:14px}
+.parts-ttl{font-size:13px;color:#aaa;letter-spacing:1px;margin-bottom:10px;padding-top:10px;border-top:2px solid #fff}
+.parts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.part-box{border:2px solid #fff;padding:10px 6px;text-align:center}
+.part-name{font-size:14px;font-weight:700;margin-bottom:6px}
+.part-grade{font-size:26px;font-weight:700;margin-bottom:6px}
+.part-bar-out{height:4px;background:#1a1a1a;border:1px solid #444;overflow:hidden;margin-bottom:5px}
+.part-bar-in{height:100%;background:#fff}
+.part-count{font-size:11px;color:#888}
+.cel{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s}
+.cel.on{opacity:1;pointer-events:all}
+.cel-box{background:#000;border:4px solid #fff;padding:30px 22px;text-align:center;max-width:290px;width:90%;position:relative}
+.cel-box::after{content:'';position:absolute;inset:5px;border:1px solid #fff;pointer-events:none}
+.cel-icon{font-size:46px;margin-bottom:10px}
+.cel-title{font-size:22px;letter-spacing:2px;margin-bottom:8px}
+.cel-sub{font-size:13px;color:#ccc;margin-bottom:14px}
+.cel-hint{font-size:11px;color:#555}
+.hist-tabs{display:flex;gap:6px;margin-bottom:12px}
+.hist-card{border:2px solid #444;padding:12px;margin-bottom:8px}
+.hist-date-lbl{font-size:13px;color:#aaa;margin-bottom:8px}
+.hist-day-ttl{font-size:14px;margin-bottom:5px}
+.hist-ex-row{font-size:13px;color:#ccc;margin-bottom:4px;padding-left:8px;border-left:2px solid #444}
+.hist-ex-row b{color:#fff}
+.mgraph{display:flex;align-items:flex-end;gap:2px;height:28px;margin:5px 0 3px}
+.mbar{flex:1;background:#444;min-height:2px}
+.mbar.pk{background:#fff}
+.edit-day{border:2px solid #fff;margin-bottom:10px}
+.edit-day-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer}
+.edit-day-ttl{font-size:14px}
+.edit-day-body{display:none;padding:10px 12px 12px;border-top:1px solid #444}
+.edit-day-body.open{display:block}
+.edit-ex{border:1px solid #444;margin-bottom:8px;padding:10px 11px}
+.edit-field{display:grid;grid-template-columns:80px 1fr;gap:6px;align-items:center;margin-bottom:6px}
+.edit-lbl{font-size:11px;color:#888}
+.edit-inp{background:#000;border:2px solid #444;padding:6px 8px;font-size:13px;color:#fff;width:100%;font-family:'DotGothic16',monospace}
+.edit-inp:focus{outline:none;border-color:#fff}
+.edit-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.edit-mini-lbl{font-size:10px;color:#888;margin-bottom:3px}
+.edit-mini-inp{background:#000;border:2px solid #444;padding:6px 4px;font-size:13px;color:#fff;text-align:center;width:100%;font-family:'DotGothic16',monospace}
+.edit-mini-inp:focus{outline:none;border-color:#fff}
+.edit-del-btn{background:#000;border:1px solid #f44;color:#f44;font-size:11px;padding:4px 8px;cursor:pointer;font-family:'DotGothic16',monospace}
+.edit-add-btn{width:100%;padding:8px;background:#000;border:1px dashed #444;color:#666;font-size:12px;cursor:pointer;font-family:'DotGothic16',monospace;margin-top:4px}
+.edit-reset-btn{width:100%;padding:10px;background:#000;border:2px solid #f44;color:#f44;font-size:13px;cursor:pointer;font-family:'DotGothic16',monospace;margin-top:12px}
+.part-select{background:#000;border:2px solid #444;color:#fff;font-size:12px;padding:5px;font-family:'DotGothic16',monospace;width:100%}
+.part-select:focus{outline:none;border-color:#fff}
+.export-box{border:2px solid #444;padding:12px;margin-top:12px}
+.export-ta{width:100%;background:#000;border:1px solid #444;padding:8px;font-size:11px;color:#888;font-family:monospace;resize:none;height:80px;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="cel" id="cel" onclick="closeCel()">
+  <div class="cel-box">
+    <div class="cel-icon" id="cel-icon"></div>
+    <div class="cel-title" id="cel-title"></div>
+    <div class="cel-sub" id="cel-sub"></div>
+    <div class="cel-hint">タップして閉じる</div>
+  </div>
+</div>
+
+<div class="hd">
+  <div class="hd-top">⚔ TRAINING LOG<span class="hd-date" id="tlbl"></span></div>
+  <div class="tabs">
+    <button class="tab on" id="t-menu" onclick="nav('menu')">▶ メニュー</button>
+    <button class="tab" id="t-stat" onclick="nav('stat')">★ ステータス</button>
+    <button class="tab" id="t-hist" onclick="nav('hist')">📜 履歴</button>
+    <button class="tab" id="t-edit" onclick="nav('edit')">✏ 編集</button>
+  </div>
+</div>
+
+<div class="page on" id="page-menu"></div>
+<div class="page" id="page-stat"></div>
+<div class="page" id="page-hist"></div>
+<div class="page" id="page-edit"></div>
+
+<div class="bot">
+  <button class="btn sec" onclick="doReset()">やり直す</button>
+  <button class="btn pri" onclick="doSave()">💾 記録を保存</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// PROG: 絶対に変更しない。変更はcustomProgのみ。
+// ═══════════════════════════════════════════
+const PROG = [
+  { id:'mon', lbl:'月', title:'Upper Push', sub:'胸・肩・腕', exs:[
+    { name:'ベンチプレス',         plan:'4×5rep / 目安95kg',     sets:4, dw:'95',   dr:'5'  },
+    { name:'デクラインチェストプレス', plan:'3×10rep / 目安60kg', sets:3, dw:'60',   dr:'10' },
+    { name:'ショルダープレス',     plan:'4×8rep / 目安37.5kg',   sets:4, dw:'37.5', dr:'8'  },
+    { name:'サイドレイズ',         plan:'4×15rep / 目安8kg',     sets:4, dw:'8',    dr:'15' },
+    { name:'ケーブルフライ',       plan:'3×12rep',               sets:3, dw:'',     dr:'12' },
+    { name:'プレスダウン',         plan:'3×12rep / 目安15kg',    sets:3, dw:'15',   dr:'12' },
+  ]},
+  { id:'tue', lbl:'火', title:'Lower Body', sub:'下半身・肩', exs:[
+    { name:'ブルガリアンスクワット', plan:'3×10rep（各脚）/ 目安24kg',      sets:3, dw:'24', dr:'10' },
+    { name:'片脚デッドリフト',      plan:'3×10rep（各脚）/ 軽め・体幹重視', sets:3, dw:'',   dr:'10' },
+    { name:'レッグカール',          plan:'3×12rep / 目安20kg',             sets:3, dw:'20', dr:'12' },
+    { name:'サイドレイズ',          plan:'3×15rep / 目安8kg',              sets:3, dw:'8',  dr:'15' },
+    { name:'リアレイズ',            plan:'3×15rep / 目安8kg',              sets:3, dw:'8',  dr:'15' },
+  ]},
+  { id:'thu', lbl:'木', title:'Upper Pull', sub:'背中・二頭・肩', exs:[
+    { name:'懸垂',               plan:'4×6rep（自重）',        sets:4, dw:'自重', dr:'6'  },
+    { name:'インクラインDBロウ', plan:'4×10rep / 目安24kg',    sets:4, dw:'24',   dr:'10' },
+    { name:'ケーブルロウ',       plan:'3×12rep / 目安50kg',    sets:3, dw:'50',   dr:'12' },
+    { name:'フェイスプル',       plan:'4×15rep',               sets:4, dw:'',     dr:'15' },
+    { name:'リアレイズ',         plan:'3×15rep / 目安8kg',     sets:3, dw:'8',    dr:'15' },
+    { name:'バーベルカール',     plan:'3×10rep / 目安30kg',    sets:3, dw:'30',   dr:'10' },
+    { name:'ハンマーカール',     plan:'3×12rep / 目安25kg',    sets:3, dw:'25',   dr:'12' },
+  ]},
+  { id:'sat', lbl:'土', title:'Conditioning', sub:'体力', exs:[
+    { name:'ウォームアップ',     plan:'モビリティ10分',                  sets:1, dw:'-', dr:'10分' },
+    { name:'ケトルベルスイング', plan:'3ラウンド×20rep',                 sets:3, dw:'',  dr:'20'   },
+    { name:'ボックスジャンプ',   plan:'3ラウンド×10rep',                 sets:3, dw:'-', dr:'10'   },
+    { name:'懸垂',               plan:'3ラウンド×8rep',                  sets:3, dw:'-', dr:'8'    },
+    { name:'バーピー',           plan:'3ラウンド×10rep',                 sets:3, dw:'-', dr:'10'   },
+    { name:'プランク',           plan:'3ラウンド×45秒',                  sets:3, dw:'-', dr:'45秒' },
+    { name:'インターバル走',     plan:'20分（速1分→軽1.5分×8セット）',  sets:1, dw:'-', dr:'20分' },
+  ]},
+];
+
+// 部位マスター（PROG定義に基づく固定マッピング）
+const PART_MAP = {
+  chest:    [{id:'mon', exs:[0,1]}],
+  shoulder: [{id:'mon', exs:[2,3]}, {id:'tue', exs:[3,4]}],
+  arm:      [{id:'mon', exs:[5]},   {id:'thu', exs:[5,6]}],
+  back:     [{id:'thu', exs:[0,1,2,3,4]}],
+  leg:      [{id:'tue', exs:[0,1,2]}],
+  cardio:   [{id:'sat', exs:[0,1,2,3,4,5,6]}],
+};
+const PART_LABELS = { chest:'胸', shoulder:'肩', arm:'腕', back:'背中', leg:'脚', cardio:'体力' };
+
+const PART_OPTIONS = Object.keys(PART_LABELS).map(k => ({key:k, lbl:PART_LABELS[k]}));
+
+const RANKS = [
+  {min:0,  lv:1,  name:'見習いトレーニー',   icon:'🌱'},
+  {min:3,  lv:2,  name:'駆け出しトレーニー', icon:'👟'},
+  {min:8,  lv:3,  name:'一人前トレーニー',   icon:'💪'},
+  {min:15, lv:4,  name:'中堅トレーニー',     icon:'🏋️'},
+  {min:25, lv:5,  name:'熟練トレーニー',     icon:'🔥'},
+  {min:40, lv:6,  name:'上級トレーニー',     icon:'⚡'},
+  {min:60, lv:7,  name:'エリートトレーニー', icon:'🔩'},
+  {min:85, lv:8,  name:'マスタートレーニー', icon:'👑'},
+  {min:120,lv:9,  name:'伝説のトレーニー',   icon:'💎'},
+  {min:200,lv:10, name:'動けるマッチョ',     icon:'⚔️'},
+];
+
+// ═══════════════════════════════════════════
+// STORAGE
+// DB構造: { sessions:[{date, data}], today:{}, customProg:null|[...] }
+// data[dayId].sets[ek][sk] = {w, r, done}  ※キーは常に文字列
+// customProg はPROGのコピーに編集を加えたもの。PROGは絶対に変更しない。
+// ═══════════════════════════════════════════
+const STORE_KEY = 'tl2026';
+
+function dbLoad() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return { sessions:[], today:{}, customProg:null };
+    const d = JSON.parse(raw);
+    // Ensure required fields exist
+    if (!d.sessions) d.sessions = [];
+    if (!d.today) d.today = {};
+    if (!('customProg' in d)) d.customProg = null;
+    return d;
+  } catch(e) {
+    return { sessions:[], today:{}, customProg:null };
+  }
+}
+
+function dbSave() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+  } catch(e) {
+    showToast('保存に失敗しました（容量不足の可能性）');
+  }
+}
+
+let DB = dbLoad();
+
+// ═══════════════════════════════════════════
+// ACTIVE PROGRAM
+// customProg があればそれを、なければ PROG をベースに生成
+// ═══════════════════════════════════════════
+function getActiveProg() {
+  if (DB.customProg && DB.customProg.length > 0) return DB.customProg;
+  // Generate from PROG with defaults
+  return PROG.map(day => ({
+    id:    day.id,
+    lbl:   day.lbl,
+    title: day.title,
+    sub:   day.sub,
+    exs:   day.exs.map((ex, ei) => ({
+      exId:   day.id + '_' + ei,
+      name:   ex.name,
+      plan:   ex.plan,
+      sets:   ex.sets,
+      dw:     ex.dw,
+      dr:     ex.dr,
+      part:   getDefaultPart(day.id, ei),
+      hidden: false,
+    }))
+  }));
+}
+
+function getDefaultPart(dayId, ei) {
+  for (const [part, srcs] of Object.entries(PART_MAP)) {
+    for (const src of srcs) {
+      if (src.id === dayId && src.exs.includes(ei)) return part;
+    }
+  }
+  return 'cardio';
+}
+
+function ensureCustomProg() {
+  if (!DB.customProg || DB.customProg.length === 0) {
+    DB.customProg = getActiveProg();
+    dbSave();
+  }
+}
+
+// ═══════════════════════════════════════════
+// DATE / HEADER
+// ═══════════════════════════════════════════
+const WD = ['日','月','火','水','木','金','土'];
+const NOW = new Date();
+document.getElementById('tlbl').textContent =
+  ' ' + (NOW.getMonth()+1) + '/' + NOW.getDate() + '(' + WD[NOW.getDay()] + ')';
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+function nav(p) {
+  ['menu','stat','hist','edit'].forEach(x => {
+    document.getElementById('page-'+x).classList.toggle('on', x===p);
+    document.getElementById('t-'+x).classList.toggle('on', x===p);
+  });
+  if (p === 'stat') renderStat();
+  if (p === 'hist') renderHist();
+  if (p === 'edit') renderEdit();
+}
+
+// ═══════════════════════════════════════════
+// MENU
+// ═══════════════════════════════════════════
+function renderMenu() {
+  const c = document.getElementById('page-menu');
+  c.innerHTML = '';
+  getActiveProg().forEach(day => {
+    const wrap = document.createElement('div');
+    wrap.className = 'dqwin';
+    wrap.innerHTML = buildDayHTML(day);
+    c.appendChild(wrap);
+  });
+}
+
+function buildDayHTML(day) {
+  const pct = calcPct(day.id);
+  const exsHTML = day.exs
+    .filter(ex => !ex.hidden)
+    .map((ex, i) => {
+      const ei = day.exs.indexOf(ex);
+      return buildExHTML(day.id, ex, ei);
+    }).join('');
+  const memo = (DB.today[day.id] && DB.today[day.id].memo) || '';
+  return `
+    <div class="day-hd" onclick="toggleDay('${day.id}')">
+      <div class="day-lbl">${day.lbl}</div>
+      <div class="day-info">
+        <div class="day-title">${day.title}</div>
+        <div class="day-sub">${day.sub}</div>
+      </div>
+      <div class="day-pct" id="pct-${day.id}">${pct > 0 ? pct+'%' : ''}</div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" id="pb-${day.id}" style="width:${pct}%"></div></div>
+    <div class="day-body" id="body-${day.id}">
+      ${exsHTML}
+      <div class="memo-lbl">メモ</div>
+      <textarea class="memo-ta" placeholder="体調・フォームなど"
+        oninput="onMemo('${day.id}',this.value)">${memo}</textarea>
+    </div>`;
+}
+
+function buildExHTML(dayId, ex, ei) {
+  const ek = String(ei);
+  const saved = (DB.today[dayId] && DB.today[dayId].sets && DB.today[dayId].sets[ek]) || {};
+  const savedN = Object.keys(saved).filter(k => !isNaN(+k)).length;
+  const rowCount = Math.max(ex.sets, savedN);
+  let rows = '';
+  for (let si = 0; si < rowCount; si++) {
+    const sk = String(si);
+    const s = saved[sk] || {};
+    const wVal = (s.w !== undefined && s.w !== '') ? s.w : (si < ex.sets ? ex.dw : '');
+    const rVal = (s.r !== undefined && s.r !== '') ? s.r : (si < ex.sets ? ex.dr : '');
+    const done = !!s.done;
+    rows += `
+      <div class="set-row">
+        <span class="sn">${si+1}</span>
+        <input class="inp" type="text" inputmode="decimal" placeholder="kg"
+          value="${wVal}" id="iw-${dayId}-${ei}-${si}"
+          oninput="onInput('${dayId}','${ei}','${si}','w',this.value)">
+        <input class="inp" type="text" inputmode="numeric" placeholder="rep"
+          value="${rVal}" id="ir-${dayId}-${ei}-${si}"
+          oninput="onInput('${dayId}','${ei}','${si}','r',this.value)">
+        <button class="chk${done?' on':''}" id="ck-${dayId}-${ei}-${si}"
+          onclick="onCheck('${dayId}','${ei}','${si}',this)">${done?'✓':''}</button>
+      </div>`;
+  }
+  return `
+    <div class="ex">
+      <div class="ex-hd" onclick="toggleEx('${dayId}','${ei}')">
+        <div>
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-plan">${ex.plan}</div>
+        </div>
+        <div class="ex-chv" id="ec-${dayId}-${ei}">▶</div>
+      </div>
+      <div class="ex-body" id="eb-${dayId}-${ei}">
+        <div class="plan-tag">PLAN: ${ex.sets}セット</div>
+        <div class="tbl-hd"><span>SET</span><span>重量</span><span>回数</span><span>✓</span></div>
+        <div id="rows-${dayId}-${ei}">${rows}</div>
+        <button class="add-row-btn" onclick="onAddSet('${dayId}','${ei}')">＋ セット追加</button>
+      </div>
+    </div>`;
+}
+
+function toggleDay(id) { document.getElementById('body-'+id).classList.toggle('open'); }
+function toggleEx(d,e) {
+  document.getElementById('eb-'+d+'-'+e).classList.toggle('open');
+  document.getElementById('ec-'+d+'-'+e).classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════
+// INPUT HANDLERS
+// ═══════════════════════════════════════════
+function ensureSlot(dayId, ei, si) {
+  const ek = String(ei), sk = String(si);
+  if (!DB.today[dayId]) DB.today[dayId] = {};
+  if (!DB.today[dayId].sets) DB.today[dayId].sets = {};
+  if (!DB.today[dayId].sets[ek]) DB.today[dayId].sets[ek] = {};
+  if (!DB.today[dayId].sets[ek][sk]) DB.today[dayId].sets[ek][sk] = {w:'',r:'',done:false};
+  return DB.today[dayId].sets[ek][sk];
+}
+
+function onInput(dayId, ei, si, field, value) {
+  const s = ensureSlot(dayId, ei, si);
+  s[field] = value;
+  dbSave();
+}
+
+function onCheck(dayId, ei, si, btn) {
+  const s = ensureSlot(dayId, ei, si);
+  if (!s.done) {
+    // チェック時: 現在の入力値（デフォルト表示含む）を保存
+    const wEl = document.getElementById('iw-'+dayId+'-'+ei+'-'+si);
+    const rEl = document.getElementById('ir-'+dayId+'-'+ei+'-'+si);
+    if (wEl) s.w = wEl.value;
+    if (rEl) s.r = rEl.value;
+    s.done = true;
+  } else {
+    // チェック解除: doneだけfalseに。w,rは残す。
+    s.done = false;
+  }
+  btn.classList.toggle('on', s.done);
+  btn.textContent = s.done ? '✓' : '';
+  dbSave();
+  updatePctBar(dayId);
+}
+
+function onMemo(dayId, value) {
+  if (!DB.today[dayId]) DB.today[dayId] = {};
+  DB.today[dayId].memo = value;
+  dbSave();
+}
+
+function onAddSet(dayId, ei) {
+  const ek = String(ei);
+  if (!DB.today[dayId]) DB.today[dayId] = {};
+  if (!DB.today[dayId].sets) DB.today[dayId].sets = {};
+  if (!DB.today[dayId].sets[ek]) DB.today[dayId].sets[ek] = {};
+  const si = Object.keys(DB.today[dayId].sets[ek]).filter(k => !isNaN(+k)).length;
+  DB.today[dayId].sets[ek][String(si)] = {w:'',r:'',done:false};
+  dbSave();
+  const container = document.getElementById('rows-'+dayId+'-'+ei);
+  const row = document.createElement('div');
+  row.className = 'set-row';
+  row.innerHTML = `
+    <span class="sn">${si+1}</span>
+    <input class="inp" type="text" inputmode="decimal" placeholder="kg"
+      id="iw-${dayId}-${ei}-${si}"
+      oninput="onInput('${dayId}','${ei}','${si}','w',this.value)">
+    <input class="inp" type="text" inputmode="numeric" placeholder="rep"
+      id="ir-${dayId}-${ei}-${si}"
+      oninput="onInput('${dayId}','${ei}','${si}','r',this.value)">
+    <button class="chk" id="ck-${dayId}-${ei}-${si}"
+      onclick="onCheck('${dayId}','${ei}','${si}',this)"></button>`;
+  container.appendChild(row);
+}
+
+// ═══════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════
+function calcPct(dayId) {
+  const day = getActiveProg().find(d => d.id === dayId);
+  if (!day) return 0;
+  const sets = (DB.today[dayId] && DB.today[dayId].sets) || {};
+  let total = 0, done = 0;
+  day.exs.forEach((ex, ei) => {
+    if (ex.hidden) return;
+    const ek = String(ei);
+    const exSets = sets[ek] || {};
+    const n = Math.max(ex.sets, Object.keys(exSets).filter(k => !isNaN(+k)).length);
+    total += n;
+    for (let si = 0; si < n; si++) {
+      if (exSets[String(si)] && exSets[String(si)].done) done++;
+    }
+  });
+  return total > 0 ? Math.round(done/total*100) : 0;
+}
+
+function updatePctBar(dayId) {
+  const pct = calcPct(dayId);
+  const bar = document.getElementById('pb-'+dayId);
+  const lbl = document.getElementById('pct-'+dayId);
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = pct > 0 ? pct + '%' : '';
+}
+
+// ═══════════════════════════════════════════
+// SAVE / RESET
+// ═══════════════════════════════════════════
+function doSave() {
+  const hasData = Object.keys(DB.today).some(dayId => {
+    const d = DB.today[dayId];
+    if (!d || !d.sets) return false;
+    return Object.keys(d.sets).some(ek =>
+      Object.keys(d.sets[ek]).some(sk => {
+        const s = d.sets[ek][sk];
+        return s && (s.w || s.r || s.done);
+      })
+    );
+  });
+  if (!hasData) { showToast('記録がありません'); return; }
+
+  const prevTotal = DB.sessions.length;
+  const prevPBs = calcAllPBs();
+  const t = todayISO();
+  DB.sessions = DB.sessions.filter(s => s.date !== t);
+  DB.sessions.unshift({ date: t, data: JSON.parse(JSON.stringify(DB.today)) });
+  DB.sessions = DB.sessions.slice(0, 200);
+  dbSave();
+  showToast('✓ 保存しました');
+
+  setTimeout(() => {
+    const newPBs = calcAllPBs();
+    const pbUp = Object.keys(newPBs).filter(k => !prevPBs[k] || newPBs[k] > prevPBs[k]);
+    const prevRank = getRank(prevTotal);
+    const newRank = getRank(DB.sessions.length);
+    if (newRank.lv > prevRank.lv) {
+      showCel(newRank.icon, 'レベルアップ！', 'Lv.' + newRank.lv + ' 「' + newRank.name + '」');
+    } else if (pbUp.length > 0) {
+      let exName = '';
+      getActiveProg().forEach(day => day.exs.forEach((ex, ei) => {
+        if ((day.id+'_'+ei) === pbUp[0]) exName = ex.name;
+      }));
+      showCel('★', '自己ベスト更新！', exName + '  ' + newPBs[pbUp[0]] + 'kg');
+    }
+  }, 500);
+}
+
+function doReset() {
+  if (!confirm('今日の入力をリセットしますか？\n保存済みの記録は消えません。')) return;
+  DB.today = {};
+  dbSave();
+  renderMenu();
+  showToast('リセットしました');
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2500);
+}
+function showCel(icon, title, sub) {
+  document.getElementById('cel-icon').textContent = icon;
+  document.getElementById('cel-title').textContent = title;
+  document.getElementById('cel-sub').textContent = sub;
+  document.getElementById('cel').classList.add('on');
+}
+function closeCel() { document.getElementById('cel').classList.remove('on'); }
+
+// ═══════════════════════════════════════════
+// RPG
+// ═══════════════════════════════════════════
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function getRank(n) {
+  let r = RANKS[0];
+  for (const x of RANKS) { if (n >= x.min) r = x; }
+  return r;
+}
+function calcAllPBs() {
+  const pb = {};
+  DB.sessions.forEach(session => {
+    getActiveProg().forEach(day => {
+      const dd = session.data && session.data[day.id];
+      if (!dd || !dd.sets) return;
+      day.exs.forEach((ex, ei) => {
+        if (ex.hidden) return;
+        const ek = String(ei);
+        const exSets = dd.sets[ek];
+        if (!exSets) return;
+        const key = day.id + '_' + ek;
+        Object.keys(exSets).filter(k => !isNaN(+k)).forEach(sk => {
+          const s = exSets[sk];
+          if (!s || !s.w) return;
+          const w = parseFloat(s.w);
+          if (!isNaN(w) && (!pb[key] || w > pb[key])) pb[key] = w;
+        });
+      });
+    });
+  });
+  return pb;
+}
+function calcPartScores() {
+  const scores = { chest:0, shoulder:0, arm:0, back:0, leg:0, cardio:0 };
+  // Use customProg part assignments if available, else PART_MAP
+  const prog = getActiveProg();
+  function countFromData(data) {
+    if (!data) return;
+    prog.forEach(day => {
+      const dd = data[day.id];
+      if (!dd || !dd.sets) return;
+      day.exs.forEach((ex, ei) => {
+        if (ex.hidden) return;
+        const ek = String(ei);
+        const exSets = dd.sets[ek];
+        if (!exSets) return;
+        const part = ex.part || getDefaultPart(day.id, ei);
+        Object.keys(exSets).filter(k => !isNaN(+k)).forEach(sk => {
+          const s = exSets[sk];
+          if (s && s.done && scores[part] !== undefined) scores[part]++;
+        });
+      });
+    });
+  }
+  DB.sessions.forEach(s => countFromData(s.data));
+  return scores;
+}
+function gradeOf(n) {
+  const G = [{min:0,g:'－'},{min:5,g:'E'},{min:15,g:'D'},{min:30,g:'C'},{min:55,g:'B'},{min:90,g:'A'},{min:140,g:'S'},{min:200,g:'SS'}];
+  let gi = G[0];
+  for (const x of G) { if (n >= x.min) gi = x; }
+  const next = G.find(x => x.min > n);
+  const pct = next ? Math.min(100, Math.round((n-gi.min)/(next.min-gi.min)*100)) : 100;
+  return { grade:gi.g, pct, nextMin:next?next.min:null, cur:n };
+}
+
+// ═══════════════════════════════════════════
+// STATUS
+// ═══════════════════════════════════════════
+function renderStat() {
+  const c = document.getElementById('page-stat');
+  const total = DB.sessions.length;
+  const rank = getRank(total);
+  const nextRank = RANKS.find(r => r.min > total);
+  const xpCur = total - rank.min;
+  const xpMax = nextRank ? nextRank.min - rank.min : 1;
+  const xpPct = nextRank ? Math.min(100, Math.round(xpCur/xpMax*100)) : 100;
+  const scores = calcPartScores();
+  const partBoxes = Object.keys(PART_LABELS).map(key => {
+    const gi = gradeOf(scores[key] || 0);
+    return `<div class="part-box">
+      <div class="part-name">${PART_LABELS[key]}</div>
+      <div class="part-grade">${gi.grade}</div>
+      <div class="part-bar-out"><div class="part-bar-in" style="width:${gi.pct}%"></div></div>
+      <div class="part-count">${gi.cur}set${gi.nextMin?' / next '+gi.nextMin:''}</div>
+    </div>`;
+  }).join('');
+  c.innerHTML = `
+    <div class="sec-ttl">★ ステータス</div>
+    <div class="dqwin rank-box">
+      <div class="rank-top">
+        <div class="rank-icon">${rank.icon}</div>
+        <div>
+          <div class="rank-lv">Lv.${rank.lv}</div>
+          <div class="rank-name">${rank.name}</div>
+          <div class="rank-total">累計 ${total}回</div>
+        </div>
+      </div>
+      <div class="xp-row"><span>EXP</span><span>${xpCur} / ${nextRank?xpMax:'MAX'}</span></div>
+      <div class="xp-bar-out"><div class="xp-bar-in" style="width:${xpPct}%"></div></div>
+      <div class="xp-next">${nextRank?'「'+nextRank.name+'」まで あと '+(nextRank.min-total)+'回':'★ 最強ランク達成！'}</div>
+    </div>
+    <div class="parts-ttl">▼ 部位別ステータス</div>
+    <div class="parts-grid">${partBoxes}</div>`;
+}
+
+// ═══════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════
+let histMode = 'date';
+function renderHist() {
+  const c = document.getElementById('page-hist');
+  const tabsHTML = `
+    <div class="sec-ttl">📜 履歴</div>
+    <div class="hist-tabs">
+      <button class="tab${histMode==='date'?' on':''}" onclick="setHistMode('date')">日付別</button>
+      <button class="tab${histMode==='ex'?' on':''}" onclick="setHistMode('ex')">種目別</button>
+    </div>`;
+  if (!DB.sessions.length) {
+    c.innerHTML = tabsHTML + '<div style="color:#666;padding:40px;text-align:center">まだ記録がありません</div>';
+    return;
+  }
+  c.innerHTML = tabsHTML + (histMode === 'date' ? buildHistDate() : buildHistEx());
+}
+function setHistMode(m) { histMode = m; renderHist(); }
+
+function buildHistDate() {
+  let html = '';
+  DB.sessions.forEach(session => {
+    const [y,m,d] = session.date.split('-');
+    const dt = new Date(+y,+m-1,+d);
+    let inner = '';
+    getActiveProg().forEach(day => {
+      const dd = session.data && session.data[day.id];
+      if (!dd || !dd.sets) return;
+      let exHTML = '';
+      day.exs.forEach((ex, ei) => {
+        if (ex.hidden) return;
+        const ek = String(ei);
+        const exSets = dd.sets[ek];
+        if (!exSets) return;
+        const recorded = Object.keys(exSets).filter(k => !isNaN(+k)).sort((a,b)=>+a-+b)
+          .map(k => exSets[k]).filter(s => s && s.done);
+        if (!recorded.length) return;
+        const line = recorded.map(s => `${s.w||'?'}kg×${s.r||'?'}`).join('  ');
+        exHTML += `<div class="hist-ex-row"><b>${ex.name}</b>  ${line}</div>`;
+      });
+      if (!exHTML && !dd.memo) return;
+      inner += `<div class="hist-day-ttl">${day.title}</div>${exHTML}`;
+      if (dd.memo) inner += `<div style="font-size:12px;color:#555;padding-left:8px;margin-top:3px">📝 ${dd.memo}</div>`;
+    });
+    if (!inner) return;
+    html += `<div class="hist-card">
+      <div class="hist-date-lbl">${y}/${m}/${d}（${WD[dt.getDay()]}）</div>
+      ${inner}</div>`;
+  });
+  return html || '<div style="color:#666;padding:20px;text-align:center">記録がありません</div>';
+}
+
+function buildHistEx() {
+  let html = '';
+  getActiveProg().forEach(day => {
+    let dayBlock = '';
+    day.exs.forEach((ex, ei) => {
+      if (ex.hidden) return;
+      const ek = String(ei);
+      let rows = '';
+      const graphData = [];
+      [...DB.sessions].reverse().forEach(session => {
+        const dd = session.data && session.data[day.id];
+        if (!dd || !dd.sets || !dd.sets[ek]) return;
+        const recorded = Object.keys(dd.sets[ek]).filter(k => !isNaN(+k)).sort((a,b)=>+a-+b)
+          .map(k => dd.sets[ek][k]).filter(s => s && s.done);
+        if (!recorded.length) return;
+        const [y,m,d2] = session.date.split('-');
+        const dt = new Date(+y,+m-1,+d2);
+        const maxW = Math.max(...recorded.map(s => parseFloat(s.w)||0));
+        graphData.push({w:maxW});
+        const line = recorded.map(s => `${s.w||'?'}kg×${s.r||'?'}`).join('  ');
+        rows += `<div style="display:flex;gap:10px;padding:4px 0;border-bottom:1px solid #1a1a1a;font-size:13px">
+          <span style="color:#666;flex-shrink:0">${m}/${d2}(${WD[dt.getDay()]})</span>
+          <span>${line}</span></div>`;
+      });
+      if (!rows) return;
+      const maxW = Math.max(...graphData.map(r => r.w||0));
+      const graph = maxW > 0 ? '<div class="mgraph">' + graphData.slice(-10).map(r => {
+        const h = Math.max(2, Math.round((r.w/maxW)*26));
+        return `<div class="mbar${r.w===maxW?' pk':''}" style="height:${h}px"></div>`;
+      }).join('') + '</div>' : '';
+      dayBlock += `<div style="margin-bottom:14px">
+        <div style="font-size:14px;font-weight:700;border-left:3px solid #fff;padding-left:8px;margin-bottom:6px">${ex.name}</div>
+        ${graph}${rows}</div>`;
+    });
+    if (!dayBlock) return;
+    html += `<div class="hist-card">
+      <div class="hist-day-ttl" style="margin-bottom:10px">${day.title} - ${day.sub}</div>
+      ${dayBlock}</div>`;
+  });
+  return html || '<div style="color:#666;padding:20px;text-align:center">記録がありません</div>';
+}
+
+// ═══════════════════════════════════════════
+// EDIT
+// customProgを編集する。PROGは絶対に触らない。
+// ═══════════════════════════════════════════
+function renderEdit() {
+  ensureCustomProg();
+  const c = document.getElementById('page-edit');
+  const daysHTML = DB.customProg.map((day, di) => {
+    const visible = day.exs.filter(ex => !ex.hidden).length;
+    return `<div class="edit-day">
+      <div class="edit-day-hd" onclick="toggleEditDay(${di})">
+        <span class="edit-day-ttl">${day.lbl} ${day.title}（${visible}種目）</span>
+        <span style="color:#888">▼</span>
+      </div>
+      <div class="edit-day-body" id="edb-${di}">
+        ${day.exs.map((ex, ei) => ex.hidden ? '' : buildEditExHTML(di, ei, ex)).join('')}
+        <button class="edit-add-btn" onclick="addEditEx(${di})">＋ 種目を追加</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Export area
+  const exportData = JSON.stringify({sessions: DB.sessions, customProg: DB.customProg}, null, 2);
+
+  c.innerHTML = `
+    <div class="sec-ttl">✏ メニュー編集</div>
+    <div style="font-size:12px;color:#888;margin-bottom:12px">種目の変更・追加・削除ができます。過去の記録は消えません。</div>
+    ${daysHTML}
+    <button class="edit-reset-btn" onclick="resetToDefault()">⚠ 初期メニューに戻す</button>
+    <div class="export-box">
+      <div style="font-size:12px;color:#888;margin-bottom:4px">▼ データバックアップ（コピーして保存）</div>
+      <textarea class="export-ta" readonly onclick="this.select()">${exportData}</textarea>
+      <button onclick="copyExport()" style="width:100%;padding:8px;background:#000;border:1px solid #444;color:#aaa;font-size:12px;cursor:pointer;font-family:'DotGothic16',monospace;margin-top:6px">📋 コピー</button>
+    </div>
+    <div style="height:20px"></div>`;
+}
+
+function buildEditExHTML(di, ei, ex) {
+  const partOpts = PART_OPTIONS.map(p =>
+    `<option value="${p.key}"${ex.part===p.key?' selected':''}>${p.lbl}</option>`
+  ).join('');
+  return `<div class="edit-ex">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px;color:#888">${ei+1}. ${ex.name}</span>
+      <button class="edit-del-btn" onclick="deleteEditEx(${di},${ei})">削除</button>
+    </div>
+    <div class="edit-field">
+      <span class="edit-lbl">種目名</span>
+      <input class="edit-inp" type="text" value="${ex.name}"
+        oninput="editField(${di},${ei},'name',this.value)">
+    </div>
+    <div class="edit-field">
+      <span class="edit-lbl">プラン</span>
+      <input class="edit-inp" type="text" value="${ex.plan}" placeholder="例: 4×8rep / 目安60kg"
+        oninput="editField(${di},${ei},'plan',this.value)">
+    </div>
+    <div class="edit-row3">
+      <div>
+        <div class="edit-mini-lbl">セット数</div>
+        <input class="edit-mini-inp" type="number" inputmode="numeric" min="1" max="10" value="${ex.sets}"
+          oninput="editField(${di},${ei},'sets',+this.value||1)">
+      </div>
+      <div>
+        <div class="edit-mini-lbl">目安重量</div>
+        <input class="edit-mini-inp" type="text" value="${ex.dw}" placeholder="kg"
+          oninput="editField(${di},${ei},'dw',this.value)">
+      </div>
+      <div>
+        <div class="edit-mini-lbl">目安回数</div>
+        <input class="edit-mini-inp" type="text" value="${ex.dr}" placeholder="rep"
+          oninput="editField(${di},${ei},'dr',this.value)">
+      </div>
+    </div>
+    <div class="edit-field">
+      <span class="edit-lbl">部位</span>
+      <select class="part-select" onchange="editField(${di},${ei},'part',this.value)">${partOpts}</select>
+    </div>
+  </div>`;
+}
+
+function toggleEditDay(di) { document.getElementById('edb-'+di).classList.toggle('open'); }
+
+function editField(di, ei, field, value) {
+  ensureCustomProg();
+  DB.customProg[di].exs[ei][field] = value;
+  dbSave();
+  renderMenu(); // メニューに即反映
+}
+
+function deleteEditEx(di, ei) {
+  if (!confirm('この種目を削除しますか？\n過去の記録は履歴に残ります。')) return;
+  ensureCustomProg();
+  DB.customProg[di].exs[ei].hidden = true;
+  dbSave();
+  renderEdit();
+  renderMenu();
+  showToast('種目を削除しました');
+}
+
+function addEditEx(di) {
+  ensureCustomProg();
+  const day = DB.customProg[di];
+  day.exs.push({
+    exId:   day.id + '_new_' + Date.now(),
+    name:   '新しい種目',
+    plan:   '',
+    sets:   3,
+    dw:     '',
+    dr:     '',
+    part:   'chest',
+    hidden: false,
+  });
+  dbSave();
+  renderEdit();
+  renderMenu();
+  showToast('種目を追加しました');
+}
+
+function resetToDefault() {
+  if (!confirm('初期メニューに戻しますか？\n編集内容はリセットされます。過去の記録は残ります。')) return;
+  DB.customProg = null;
+  dbSave();
+  renderEdit();
+  renderMenu();
+  showToast('初期メニューに戻しました');
+}
+
+function copyExport() {
+  const ta = document.querySelector('.export-ta');
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast('コピーしました');
+  } catch(e) {
+    showToast('手動でコピーしてください');
+  }
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+renderMenu();
+</script>
+</body>
+</html>
