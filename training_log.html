@@ -113,6 +113,9 @@ body{background:#000;color:#fff;font-family:'DotGothic16',monospace;padding-bott
 .part-select:focus{outline:none;border-color:#fff}
 .export-box{border:2px solid #444;padding:12px;margin-top:12px}
 .export-ta{width:100%;background:#000;border:1px solid #444;padding:8px;font-size:11px;color:#888;font-family:monospace;resize:none;height:80px;margin-top:6px}
+.char-wrap{text-align:center;padding:12px 0 8px;margin-bottom:14px}
+.char-power{font-size:12px;color:#888;margin-top:8px;letter-spacing:2px}
+.char-title{font-size:11px;color:#555;margin-top:3px;letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -627,6 +630,143 @@ function gradeOf(n) {
 }
 
 // ═══════════════════════════════════════════
+// CHARACTER SVG (ドット絵風キャラクター)
+// ═══════════════════════════════════════════
+function buildCharSVG(scores, rankLv) {
+  const GN = {'－':0,'E':1,'D':2,'C':3,'B':4,'A':5,'S':6,'SS':7};
+  const gn = k => GN[gradeOf(scores[k]||0).grade]||0;
+  const lerp = (a,b,t) => a+(b-a)*Math.min(1,Math.max(0,t));
+  const n7 = n => n/7;
+
+  const chN=gn('chest'), shN=gn('shoulder'), arN=gn('arm'), lgN=gn('leg');
+  // ランクで全体スケール変化 (lv1=0.82, lv10=1.12)
+  const sc = lerp(0.82, 1.12, (rankLv-1)/9);
+  const cx = 50;
+
+  // 各部位の寸法 (グレードで変化)
+  const hdW=22, hdH=22;
+  const nkW=lerp(8,12,n7(shN)),   nkH=6;
+  const chW=lerp(30,56,n7(chN)),  chH=lerp(26,36,n7(chN));
+  const shW=lerp(8,15,n7(shN)),   shH=lerp(12,20,n7(shN));
+  const uaW=lerp(8,17,n7(arN)),   uaH=lerp(20,26,n7(arN));
+  const faW=lerp(6,14,n7(arN)),   faH=16;
+  const wsW=lerp(20,38,n7(chN)),  wsH=8;
+  const thW=lerp(11,22,n7(lgN)),  thH=lerp(28,36,n7(lgN));
+  const clW=lerp(8,15,n7(lgN)),   clH=20;
+  const ftW=clW+4, ftH=5;
+
+  // Y座標 (積み上げ)
+  const hdY=8;
+  const nkY=hdY+hdH;
+  const chY=nkY+nkH;
+  const wsY=chY+chH;
+  const thY=wsY+wsH;
+  const clY=thY+thH;
+  const ftY=clY+clH;
+  const botY=ftY+ftH;
+  const charCY=hdY+(botY-hdY)/2; // スケール中心Y
+
+  // X座標
+  const gap=4;
+  const tlX=cx-gap/2-thW, trX=cx+gap/2;
+  const laX=cx-chW/2-shW+(shW-uaW)/2;
+  const raX=cx+chW/2+shW/2-uaW/2;
+  const armY=chY+4;
+  const faXL=laX+(uaW-faW)/2, faXR=raX+(uaW-faW)/2;
+  const clXL=tlX+(thW-clW)/2,  clXR=trX+(thW-clW)/2;
+
+  const R=[];
+  const r=(x,y,w,h,f='#fff')=>{
+    w=Math.max(0,Math.round(w)); h=Math.max(0,Math.round(h));
+    if(!w||!h)return;
+    R.push(`<rect x="${Math.round(x)}" y="${Math.round(y)}" width="${w}" height="${h}" fill="${f}"/>`);
+  };
+
+  // ── 髪 ──
+  r(cx-9, hdY-5, 4, 5);
+  r(cx-3, hdY-7, 5, 7);
+  r(cx+4, hdY-5, 4, 5);
+
+  // ── 頭 ──
+  r(cx-hdW/2, hdY, hdW, hdH);
+  r(cx-7, hdY+7, 4, 4, '#000');   // 左目
+  r(cx+3, hdY+7, 4, 4, '#000');   // 右目
+  r(cx-5, hdY+16, 10, 3, '#000'); // 口
+  // ランクが上がると眉が険しくなる
+  if(rankLv>=5){ r(cx-9,hdY+4,6,2,'#000'); r(cx+3,hdY+4,6,2,'#000'); }
+  // バトルスカー (lv8以上)
+  if(rankLv>=8){ r(cx+2,hdY+9,2,5,'#888'); }
+
+  // ── 首 ──
+  r(cx-nkW/2, nkY, nkW, nkH);
+
+  // ── 肩 ──
+  r(cx-chW/2-shW, chY, shW, shH);
+  r(cx+chW/2, chY, shW, shH);
+
+  // ── 胸 ──
+  r(cx-chW/2, chY, chW, chH);
+  if(chN>=3){ r(cx-1, chY+5, 2, chH-10, '#666'); } // 胸中央線
+  if(chN>=5){
+    r(cx-chW/2+4, chY+5, chW/2-6, 2, '#aaa'); // 左大胸筋ライン
+    r(cx+2, chY+5, chW/2-6, 2, '#aaa');       // 右大胸筋ライン
+  }
+
+  // ── 上腕 ──
+  r(laX, armY, uaW, uaH);
+  r(raX, armY, uaW, uaH);
+  if(arN>=4){ // 力こぶ
+    r(laX, armY+2, uaW, 4, '#ccc');
+    r(raX, armY+2, uaW, 4, '#ccc');
+  }
+
+  // ── 前腕 ──
+  r(faXL, armY+uaH, faW, faH);
+  r(faXR, armY+uaH, faW, faH);
+
+  // ── 拳 ──
+  r(faXL-1, armY+uaH+faH, faW+2, 5);
+  r(faXR-1, armY+uaH+faH, faW+2, 5);
+
+  // ── 腹・腰 ──
+  r(cx-wsW/2, wsY, wsW, wsH);
+  if(chN>=4){
+    r(cx-wsW/2+2, wsY+2, (wsW-4)/2-1, wsH-4, '#888'); // 腹筋左
+    r(cx+1,       wsY+2, (wsW-4)/2-1, wsH-4, '#888'); // 腹筋右
+  }
+  // ベルトバックル
+  r(cx-3, wsY+wsH/2-2, 6, 4, '#888');
+  r(cx-1, wsY+wsH/2-1, 2, 2, '#fff');
+
+  // ── 太もも ──
+  r(tlX, thY, thW, thH);
+  r(trX, thY, thW, thH);
+  if(lgN>=4){
+    r(tlX+Math.floor(thW*0.35), thY+4, 2, thH-8, '#888'); // 大腿四頭筋ライン
+    r(trX+Math.floor(thW*0.60), thY+4, 2, thH-8, '#888');
+  }
+
+  // ── ふくらはぎ ──
+  r(clXL, clY, clW, clH);
+  r(clXR, clY, clW, clH);
+
+  // ── 足・靴 ──
+  r(clXL-2, ftY, ftW, ftH);
+  r(clXR-2, ftY, ftW, ftH);
+  r(clXL-2, ftY, ftW-2, 2, '#ccc'); // 靴のハイライト
+  r(clXR-2, ftY, ftW-2, 2, '#ccc');
+
+  const viewW=100, viewH=145;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" width="110" height="160" style="display:block;margin:0 auto;image-rendering:pixelated;image-rendering:crisp-edges"><rect width="${viewW}" height="${viewH}" fill="#000"/><g transform="translate(${cx},${charCY.toFixed(1)}) scale(${sc.toFixed(3)}) translate(${-cx},${-charCY.toFixed(1)})">${R.join('')}</g></svg>`;
+}
+
+function calcPower(scores, rankLv) {
+  const GN = {'－':0,'E':1,'D':2,'C':3,'B':4,'A':5,'S':6,'SS':7};
+  const sum = Object.keys(scores).reduce((s,k) => s+(GN[gradeOf(scores[k]||0).grade]||0), 0);
+  return sum * rankLv * 10;
+}
+
+// ═══════════════════════════════════════════
 // STATUS
 // ═══════════════════════════════════════════
 function renderStat() {
@@ -661,6 +801,11 @@ function renderStat() {
       <div class="xp-row"><span>EXP</span><span>${xpCur} / ${nextRank?xpMax:'MAX'}</span></div>
       <div class="xp-bar-out"><div class="xp-bar-in" style="width:${xpPct}%"></div></div>
       <div class="xp-next">${nextRank?'「'+nextRank.name+'」まで あと '+(nextRank.min-total)+'回':'★ 最強ランク達成！'}</div>
+    </div>
+    <div class="char-wrap">
+      ${buildCharSVG(scores, rank.lv)}
+      <div class="char-power">⚡ 戦闘力: ${calcPower(scores, rank.lv)}</div>
+      <div class="char-title">体型はトレーニングで変化します</div>
     </div>
     <div class="parts-ttl">▼ 部位別ステータス</div>
     <div class="parts-grid">${partBoxes}</div>`;
