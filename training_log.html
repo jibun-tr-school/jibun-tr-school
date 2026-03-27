@@ -116,6 +116,36 @@ body{background:#000;color:#fff;font-family:'DotGothic16',monospace;padding-bott
 .char-wrap{text-align:center;padding:12px 0 8px;margin-bottom:14px}
 .char-power{font-size:12px;color:#888;margin-top:8px;letter-spacing:2px}
 .char-title{font-size:11px;color:#555;margin-top:3px;letter-spacing:1px}
+.btl{position:fixed;inset:0;background:#000;z-index:600;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .2s}
+.btl.on{opacity:1;pointer-events:all}
+.btl-top{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+.btl-win{border:3px solid #fff;padding:22px 28px;text-align:center;position:relative;min-width:220px}
+.btl-win::after{content:'';position:absolute;inset:5px;border:1px solid #fff;pointer-events:none}
+.btl-icon{font-size:54px;margin-bottom:10px;display:block}
+.btl-name{font-size:18px;letter-spacing:3px}
+.btl-msg{border-top:3px solid #fff;padding:18px 18px 32px;position:relative;cursor:pointer;min-height:100px}
+.btl-txt{font-size:14px;line-height:2;letter-spacing:1px;min-height:56px}
+.btl-nxt{position:absolute;bottom:12px;right:16px;font-size:13px;color:#888;animation:twink .8s infinite}
+@keyframes twink{0%,100%{opacity:1}50%{opacity:0}}
+.boss-box{border:3px solid #fff;padding:14px;margin-bottom:12px;position:relative}
+.boss-box::after{content:'';position:absolute;inset:4px;border:1px solid #fff;pointer-events:none}
+.boss-ttl{font-size:11px;color:#888;letter-spacing:2px;margin-bottom:10px}
+.boss-name{font-size:17px;letter-spacing:2px;margin-bottom:5px}
+.boss-quote{font-size:11px;color:#666;margin-bottom:10px;font-style:italic}
+.boss-conds{margin-bottom:8px}
+.boss-ci{display:inline-block;border:1px solid #444;padding:2px 8px;margin:2px 2px 0;font-size:11px;color:#555}
+.boss-ci.ok{border-color:#fff;color:#fff}
+.boss-fight-btn{width:100%;padding:12px;background:#fff;color:#000;border:none;font-size:14px;cursor:pointer;font-family:'DotGothic16',monospace;letter-spacing:2px;margin-top:8px}
+.boss-beaten{font-size:11px;color:#444;margin-bottom:8px}
+.week-box{border:2px solid #333;padding:12px;margin-bottom:12px}
+.week-ttl{font-size:11px;color:#888;letter-spacing:2px;margin-bottom:10px}
+.week-days{display:flex;gap:6px;margin-bottom:8px}
+.wday{flex:1;border:2px solid #333;padding:8px 2px;text-align:center}
+.wday.done{border-color:#fff;background:#fff;color:#000}
+.wday-lbl{font-size:10px;margin-bottom:3px}
+.wday-ico{font-size:14px;font-weight:700}
+.week-msg{font-size:12px;color:#888}
+.week-msg b{color:#fff}
 </style>
 </head>
 <body>
@@ -127,6 +157,19 @@ body{background:#000;color:#fff;font-family:'DotGothic16',monospace;padding-bott
     <div class="cel-title" id="cel-title"></div>
     <div class="cel-sub" id="cel-sub"></div>
     <div class="cel-hint">タップして閉じる</div>
+  </div>
+</div>
+
+<div id="btl" class="btl" onclick="btlNext()">
+  <div class="btl-top">
+    <div class="btl-win">
+      <span class="btl-icon" id="btl-icon"></span>
+      <div class="btl-name" id="btl-name"></div>
+    </div>
+  </div>
+  <div class="btl-msg">
+    <div class="btl-txt" id="btl-txt"></div>
+    <div class="btl-nxt" id="btl-nxt" style="visibility:hidden">▼</div>
   </div>
 </div>
 
@@ -215,6 +258,58 @@ const RANKS = [
   {min:120,lv:9,  name:'伝説のトレーニー',   icon:'💎'},
   {min:200,lv:10, name:'動けるマッチョ',     icon:'⚔️'},
 ];
+
+// ═══════════════════════════════════════════
+// BOSSES: 各ランクに対応する強敵
+// ═══════════════════════════════════════════
+const BOSSES = [
+  { lv:2,  icon:'👻', name:'スライムナイト',
+    taunt:  '「…ここは通さぬ。覚悟しろ」',
+    victory:'「…なかなかやるな。先へ行け」',
+    story:  'はじめての強敵を下した。前に進む力を得た。',
+    cond: {} },
+  { lv:3,  icon:'🦍', name:'ゴリラ将軍',
+    taunt:  '「フンッ！その細腕で儂に挑むか！」',
+    victory:'「ぐぬぬ…その腕力…認めよう」',
+    story:  '筋肉の里を抜けた。噂の「鉄の城」が見えてきた。',
+    cond: {arm:'E'} },
+  { lv:4,  icon:'🤖', name:'鋼鉄のゴーレム',
+    taunt:  '「貴様の胸など…薄紙だ」',
+    victory:'「そ、その胸板で…私を…」',
+    story:  '城塞を突破。大陸の中央部へと足を踏み入れた。',
+    cond: {chest:'D'} },
+  { lv:5,  icon:'⚡', name:'嵐の魔術師ライガ',
+    taunt:  '「フハハ！体力など無意味！魔力こそが全てだ！」',
+    victory:'「馬鹿な…体力で魔力を…」',
+    story:  '魔術師を打ち破った。体力こそ最大の武器だと悟った。',
+    cond: {cardio:'D'} },
+  { lv:6,  icon:'⛰', name:'山岳の覇者グラン',
+    taunt:  '「この険しい山を越えられると思うな」',
+    victory:'「その脚力…本物だ。先へ進め」',
+    story:  '山頂を制した。眼下に広がる魔王の領域。ゴールは近い。',
+    cond: {leg:'C'} },
+  { lv:7,  icon:'🗡', name:'影の暗殺者シェード',
+    taunt:  '「シュッ…気づいていたか。背中が無防備だぞ」',
+    victory:'「…その背中…ちゃんと鍛えてあるな」',
+    story:  '暗殺者を退けた。背中を鍛えることの意味を知った。',
+    cond: {back:'C'} },
+  { lv:8,  icon:'⚔', name:'古の武人ドレイク',
+    taunt:  '「真の強さを見せてみよ。本物かどうか儂が判断する」',
+    victory:'「…久しぶりに本物を見た。魔王城へ行け」',
+    story:  '武人に認められた。魔王城の門が音を立てて開いた。',
+    cond: {chest:'B', arm:'B'} },
+  { lv:9,  icon:'💀', name:'魔王の右腕バルゴ',
+    taunt:  '「魔王様の御前に立てると思うな！ここで終われ！」',
+    victory:'「ば、馬鹿な…人間ごときに…魔王様、お許しを…」',
+    story:  '右腕を下した。いよいよ魔王との最終決戦が始まる。',
+    cond: {chest:'B', leg:'B', back:'B'} },
+  { lv:10, icon:'👑', name:'魔王ダークマッスル',
+    taunt:  '「ようこそ。長い旅だったな。だが…儂には勝てまい」',
+    victory:'「信じられん…これが…人間の…力か……」',
+    story:  '魔王を倒した。しかし魔王は最後に笑って言った。「また来い」',
+    cond: {chest:'A', arm:'A', leg:'A'} },
+];
+const GRADE_ORDER = ['－','E','D','C','B','A','S','SS'];
 
 // ═══════════════════════════════════════════
 // STORAGE
@@ -536,6 +631,11 @@ function doSave() {
       }));
       showCel('★', '自己ベスト更新！', exName + '  ' + newPBs[pbUp[0]] + 'kg');
     }
+    // ボス討伐条件チェック（新たに条件達成したらトースト通知）
+    const _boss = getNextBoss(newRank.lv);
+    if (_boss && checkBossCond(_boss) && !(DB.bosses||[]).includes(_boss.lv)) {
+      setTimeout(() => showToast('⚔ ステータスを確認せよ！強敵に挑める！'), 1800);
+    }
   }, 500);
 }
 
@@ -627,6 +727,151 @@ function gradeOf(n) {
   const next = G.find(x => x.min > n);
   const pct = next ? Math.min(100, Math.round((n-gi.min)/(next.min-gi.min)*100)) : 100;
   return { grade:gi.g, pct, nextMin:next?next.min:null, cur:n };
+}
+
+// ═══════════════════════════════════════════
+// BOSS SYSTEM
+// ═══════════════════════════════════════════
+function getNextBoss(rankLv) {
+  const beaten = DB.bosses || [];
+  return BOSSES.find(b => b.lv <= rankLv && !beaten.includes(b.lv)) || null;
+}
+function checkBossCond(boss) {
+  const scores = calcPartScores();
+  return Object.entries(boss.cond).every(([p, g]) =>
+    GRADE_ORDER.indexOf(gradeOf(scores[p]||0).grade) >= GRADE_ORDER.indexOf(g)
+  );
+}
+
+let _btlLines=[], _btlPhase=0, _btlTimer=null;
+
+function fightBoss(bossLv) {
+  const boss = BOSSES.find(b => b.lv === bossLv);
+  if (!boss || !checkBossCond(boss)) return;
+  if (!DB.bosses) DB.bosses = [];
+  if (!DB.bosses.includes(bossLv)) { DB.bosses.push(bossLv); dbSave(); }
+  const power = calcPower(calcPartScores(), getRank(DB.sessions.length).lv);
+  _btlLines = [
+    boss.name + 'が現れた！',
+    boss.taunt,
+    'あなたは鍛え抜いた肉体で立ち向かった！',
+    boss.name + 'に ' + power.toLocaleString() + ' のダメージ！！',
+    boss.name + 'はたおれた！',
+    boss.victory,
+    boss.story,
+  ];
+  _btlPhase = 0;
+  document.getElementById('btl-icon').textContent = boss.icon;
+  document.getElementById('btl-name').textContent = boss.name;
+  document.getElementById('btl').classList.add('on');
+  btlType(_btlLines[0]);
+}
+function btlType(text) {
+  clearTimeout(_btlTimer);
+  const el = document.getElementById('btl-txt');
+  const nxt = document.getElementById('btl-nxt');
+  el.textContent = ''; nxt.style.visibility = 'hidden';
+  let i = 0;
+  (function tick() {
+    if (i < text.length) { el.textContent += text[i++]; _btlTimer = setTimeout(tick, 38); }
+    else { nxt.style.visibility = 'visible'; }
+  })();
+}
+function btlNext() {
+  const nxt = document.getElementById('btl-nxt');
+  if (nxt.style.visibility === 'hidden') {
+    clearTimeout(_btlTimer);
+    document.getElementById('btl-txt').textContent = _btlLines[_btlPhase];
+    nxt.style.visibility = 'visible';
+    return;
+  }
+  _btlPhase++;
+  if (_btlPhase >= _btlLines.length) { closeBtl(); return; }
+  btlType(_btlLines[_btlPhase]);
+}
+function closeBtl() {
+  clearTimeout(_btlTimer);
+  document.getElementById('btl').classList.remove('on');
+  renderStat();
+}
+
+function renderBossSection(rankLv) {
+  const beaten = DB.bosses || [];
+  const defeatedCount = BOSSES.filter(b => beaten.includes(b.lv)).length;
+  const defeatedHtml = defeatedCount > 0
+    ? `<div class="boss-beaten">討伐済み: ${defeatedCount} / ${BOSSES.length} 体</div>` : '';
+  const next = getNextBoss(rankLv);
+  if (!next) {
+    const upcoming = BOSSES.find(b => b.lv === rankLv + 1);
+    if (rankLv >= 10 && defeatedCount === BOSSES.length) {
+      return `<div class="boss-box">${defeatedHtml}
+        <div class="boss-ttl">▼ 魔王討伐</div>
+        <div class="boss-name">⚔ 全ての強敵を倒した</div>
+        <div class="boss-quote">「また来い」</div></div>`;
+    }
+    if (upcoming) {
+      return `<div class="boss-box">${defeatedHtml}
+        <div class="boss-ttl">▼ 次の強敵</div>
+        <div class="boss-name" style="color:#555">${upcoming.icon} ${upcoming.name}</div>
+        <div class="boss-quote" style="color:#444">ランクが上がると現れる…</div></div>`;
+    }
+    return defeatedHtml ? `<div class="boss-box">${defeatedHtml}</div>` : '';
+  }
+  const met = checkBossCond(next);
+  const scores = calcPartScores();
+  const condHtml = Object.keys(next.cond).length === 0 ? '' :
+    '<div class="boss-conds">' +
+    Object.entries(next.cond).map(([p, g]) => {
+      const cur = gradeOf(scores[p]||0).grade;
+      const ok = GRADE_ORDER.indexOf(cur) >= GRADE_ORDER.indexOf(g);
+      return `<span class="boss-ci${ok?' ok':''}">${ok?'✓ ':''}${PART_LABELS[p]} ${g}以上</span>`;
+    }).join('') + '</div>';
+  const actionHtml = met
+    ? `<button class="boss-fight-btn" onclick="fightBoss(${next.lv})">⚔ ${next.name}に挑む</button>`
+    : `<div style="font-size:11px;color:#666;margin-top:6px">条件を満たすと挑戦できる</div>`;
+  return `<div class="boss-box">
+    ${defeatedHtml}
+    <div class="boss-ttl">▼ 強敵が待つ</div>
+    <div class="boss-name">${next.icon} ${next.name}</div>
+    <div class="boss-quote">${next.taunt}</div>
+    ${condHtml}${actionHtml}</div>`;
+}
+
+function renderWeekDungeon() {
+  const now = new Date();
+  const dow = now.getDay();
+  const monOff = dow === 0 ? -6 : 1 - dow;
+  const mon = new Date(now); mon.setDate(now.getDate() + monOff); mon.setHours(0,0,0,0);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 7);
+  const weekSessions = DB.sessions.filter(s => { const d = new Date(s.date); return d >= mon && d < sun; });
+  const doneDayIds = new Set();
+  weekSessions.forEach(s => {
+    getActiveProg().forEach(day => {
+      const dd = s.data && s.data[day.id];
+      if (!dd || !dd.sets) return;
+      const hasDone = Object.keys(dd.sets).some(ek =>
+        Object.keys(dd.sets[ek]).some(sk => dd.sets[ek][sk] && dd.sets[ek][sk].done)
+      );
+      if (hasDone) doneDayIds.add(day.id);
+    });
+  });
+  const lblMap = {mon:'月', tue:'火', thu:'木', sat:'土'};
+  const prog = getActiveProg();
+  const slots = prog.map(day => {
+    const done = doneDayIds.has(day.id);
+    return `<div class="wday${done?' done':''}">
+      <div class="wday-lbl">${lblMap[day.id]||day.lbl}</div>
+      <div class="wday-ico">${done?'✓':'─'}</div></div>`;
+  }).join('');
+  const doneDays = doneDayIds.size, total = prog.length;
+  const msg = doneDays === total
+    ? '<b>★ 今週のダンジョン制覇！</b>'
+    : doneDays === 0 ? '今週のダンジョンに挑め！'
+    : `進捗 <b>${doneDays}/${total}</b> ─ あと${total-doneDays}回でダンジョン制覇`;
+  return `<div class="week-box">
+    <div class="week-ttl">▼ 今週のダンジョン</div>
+    <div class="week-days">${slots}</div>
+    <div class="week-msg">${msg}</div></div>`;
 }
 
 // ═══════════════════════════════════════════
@@ -802,6 +1047,8 @@ function renderStat() {
       <div class="xp-bar-out"><div class="xp-bar-in" style="width:${xpPct}%"></div></div>
       <div class="xp-next">${nextRank?'「'+nextRank.name+'」まで あと '+(nextRank.min-total)+'回':'★ 最強ランク達成！'}</div>
     </div>
+    ${renderBossSection(rank.lv)}
+    ${renderWeekDungeon()}
     <div class="char-wrap">
       ${buildCharSVG(scores, rank.lv)}
       <div class="char-power">⚡ 戦闘力: ${calcPower(scores, rank.lv)}</div>
